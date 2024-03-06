@@ -1,4 +1,4 @@
-import 'dart:convert';
+//import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:programovil/model/popular_model.dart';
@@ -10,7 +10,8 @@ class ApiPopular {
   Future<List<PopularModel>?> getPopularMovie() async {
     Response response = await dio.get(URL);
     if (response.statusCode == 200) {
-      final listMoviesMap = jsonDecode(response.data)['results'] as List;
+      //print(response.data['results'].runtimeType);
+      final listMoviesMap = response.data['results'] as List;
       return listMoviesMap.map((movie) => PopularModel.fromMap(movie)).toList();
     }
     return null;

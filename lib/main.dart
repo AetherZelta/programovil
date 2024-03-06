@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:programovil/screens/dashboard_screen.dart';
 import 'package:programovil/screens/despensa_screen.dart';
+import 'package:programovil/screens/popular_movies_screen.dart';
 import 'package:programovil/screens/splash_screen.dart';
 import 'package:programovil/settings/app_value_notifier.dart';
 import 'package:programovil/settings/theme.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
             routes: {
               "/dash": (BuildContext context) => DashboardScreen(),
               "/despensa": (BuildContext context) => DespensaScreen(),
+              "/movies": (BuildContext context) => PopularMoviesScreen(),
             },
           );
         });
