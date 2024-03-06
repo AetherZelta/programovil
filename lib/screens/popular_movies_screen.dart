@@ -26,15 +26,17 @@ class _PopularMoviesScreenState extends State<PopularMoviesScreen> {
       builder: (context, AsyncSnapshot<List<PopularModel>?> snapshot) {
         if (snapshot.hasData) {
           return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            itemCount: snapshot.data!.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
+              childAspectRatio: .7,
+              mainAxisSpacing: 10,
             ),
             itemBuilder: (context, index) {
-              return Container(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: NetworkImage(
-                            "https://image.tmdb.org/t/p/w500/${snapshot.data![index].posterPath}"))),
+              return FadeInImage(
+                placeholder: const AssetImage('images/loading.gif'),
+                image: NetworkImage(
+                    "https://image.tmdb.org/t/p/w500/${snapshot.data![index].posterPath}"),
               );
             },
           );
