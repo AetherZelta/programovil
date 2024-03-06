@@ -33,10 +33,17 @@ class _PopularMoviesScreenState extends State<PopularMoviesScreen> {
               mainAxisSpacing: 10,
             ),
             itemBuilder: (context, index) {
-              return FadeInImage(
-                placeholder: const AssetImage('images/loading.gif'),
-                image: NetworkImage(
-                    "https://image.tmdb.org/t/p/w500/${snapshot.data![index].posterPath}"),
+              return GestureDetector(
+                onTap: () => Navigator.pushNamed(context, "/detail",
+                    arguments: snapshot.data![index]),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: FadeInImage(
+                    placeholder: const AssetImage('images/loading.gif'),
+                    image: NetworkImage(
+                        "https://image.tmdb.org/t/p/w500/${snapshot.data![index].posterPath}"),
+                  ),
+                ),
               );
             },
           );

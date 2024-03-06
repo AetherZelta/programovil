@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:programovil/screens/dashboard_screen.dart';
 import 'package:programovil/screens/despensa_screen.dart';
+import 'package:programovil/screens/detail_movie_screen.dart';
 import 'package:programovil/screens/popular_movies_screen.dart';
 import 'package:programovil/screens/splash_screen.dart';
 import 'package:programovil/settings/app_value_notifier.dart';
@@ -23,9 +24,10 @@ class MyApp extends StatelessWidget {
                 : ThemeApp.lightTheme(context),
             home: SplashScreen(),
             routes: {
-              "/dash": (BuildContext context) => DashboardScreen(),
-              "/despensa": (BuildContext context) => DespensaScreen(),
-              "/movies": (BuildContext context) => PopularMoviesScreen(),
+              "/dash": (BuildContext context) => const DashboardScreen(),
+              "/despensa": (BuildContext context) => const DespensaScreen(),
+              "/movies": (BuildContext context) => const PopularMoviesScreen(),
+              "/detail": (BuildContext context) => const DetailMovieScreen()
             },
           );
         });
