@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1074601179743",
+    "project_id": "programovil-45152",
+    "storage_bucket": "programovil-45152.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074601179743:android:5762362089b5f4c856f9ea",
+        "android_client_info": {
+          "package_name": "com.example.programovil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG2e4nLEPLACUsxQlw6ifJzwcknh8Hnjw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:programovil/screens/dashboard_screen.dart';
 import 'package:programovil/screens/despensa_screen.dart';
@@ -7,7 +8,19 @@ import 'package:programovil/screens/splash_screen.dart';
 import 'package:programovil/settings/app_value_notifier.dart';
 import 'package:programovil/settings/theme.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey:
+          "AIzaSyDG2e4nLEPLACUsxQlw6ifJzwcknh8Hnjw", // paste your api key here
+      appId: "com.example.programovil", //paste your app id here
+      messagingSenderId: "1074601179743", //paste your messagingSenderId here
+      projectId: "programovil-45152",
+    ), //paste your project id here
+  );
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
