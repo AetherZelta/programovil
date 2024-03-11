@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:programovil/services/email_auth_firebase.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,12 +16,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final RegExp emailValidator =
       RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+  final name = TextEditingController();
+  final email = TextEditingController();
   final pwd = TextEditingController();
   final confirmPwd = TextEditingController();
   Uint8List? _image;
   File? selectedIMage;
   var _hidePwd = true;
   var _hideConfirmPwd = true;
+  final auth_firebase = EmailAuthFirebase();
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextFormField(
+                          controller: name,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Ingresa nombre completo';
@@ -117,6 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         TextFormField(
+                          controller: email,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Ingresa Correo Electronico';
@@ -204,12 +210,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         GestureDetector(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Se ha completado el registro'),
-                                ),
-                              );
-                              Navigator.pop(context);
+                              auth_firebase
+                                  .signUpUser(
+                                      name: name.text,
+                                      password: pwd.text,
+                                      email: email.text)
+                                  .then((value) {
+                                if (value) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Se ha completado el registro'),
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                }
+                              });
                             }
                           },
                           child: Container(
