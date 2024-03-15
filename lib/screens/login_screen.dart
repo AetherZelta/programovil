@@ -1,7 +1,11 @@
+//import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 //import 'package:programovil/screens/dashboard_screen.dart';
+//import 'package:programovil/screens/dashboard_screen.dart';
 import 'package:programovil/screens/register_screen.dart';
+import 'package:programovil/services/email_auth_firebase.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,20 +16,25 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
-
-  final txtUser = TextFormField(
-    keyboardType: TextInputType.emailAddress,
-    decoration: const InputDecoration(border: OutlineInputBorder()),
-  );
-
-  final pwdUser = TextFormField(
-    keyboardType: TextInputType.text,
-    obscureText: true,
-    decoration: const InputDecoration(border: OutlineInputBorder()),
-  );
+  final auth = EmailAuthFirebase();
+  final email = TextEditingController();
+  final pwd = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final txtUser = TextFormField(
+      controller: email,
+      keyboardType: TextInputType.emailAddress,
+      decoration: const InputDecoration(border: OutlineInputBorder()),
+    );
+
+    final pwdUser = TextFormField(
+      controller: pwd,
+      keyboardType: TextInputType.text,
+      obscureText: true,
+      decoration: const InputDecoration(border: OutlineInputBorder()),
+    );
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -76,7 +85,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           setState(() {
                             isLoading = !isLoading;
                           });
-                          Future.delayed(new Duration(milliseconds: 5000), () {
+                          auth
+                              .signInUser(password: pwd.text, email: email.text)
+                              .then((value) {
+                            if (!value) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('El Usuario no es valido'),
+                                ),
+                              );
+                            } else {
+                              Navigator.pushNamed(context, "/dash")
+                                  .then((value) {
+                                setState(() {
+                                  isLoading = !isLoading;
+                                });
+                              });
+                            }
+                          });
+
+                          /*Future.delayed(new Duration(milliseconds: 5000), () {
                             /*Navigator.push(
                                 context, 
                                 MaterialPageRoute(builder: (context) => new DashboardScreen(),)
@@ -86,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 isLoading = !isLoading;
                               });
                             });
-                          });
+                          });*/
                         }),
                         SignInButton(Buttons.Google, onPressed: () {}),
                         SignInButton(Buttons.Facebook, onPressed: () {}),
