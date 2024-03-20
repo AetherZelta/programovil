@@ -15,6 +15,7 @@ class PopularModel {
   bool? video;
   double? voteAverage;
   int? voteCount;
+  List<VideoResult>? videos;
 
   PopularModel({
     this.adult,
@@ -31,6 +32,7 @@ class PopularModel {
     this.video,
     this.voteAverage,
     this.voteCount,
+    this.videos,
   });
   factory PopularModel.fromMap(Map<String, dynamic> movie) {
     return PopularModel(
@@ -44,6 +46,47 @@ class PopularModel {
       title: movie['title'],
       voteAverage: movie['vote_average'],
       voteCount: movie['vote_count'],
+      videos: movie['videos'] != null
+          ? List<VideoResult>.from(
+              movie['videos']['results']
+                  .map((video) => VideoResult.fromMap(video)),
+            )
+          : null,
+    );
+  }
+}
+
+class VideoResult {
+  String? id;
+  String? iso6391;
+  String? iso31661;
+  String? key; // Esta es la clave del video de YouTube
+  String? name;
+  String? site;
+  int? size;
+  String? type;
+
+  VideoResult({
+    this.id,
+    this.iso6391,
+    this.iso31661,
+    this.key,
+    this.name,
+    this.site,
+    this.size,
+    this.type,
+  });
+
+  factory VideoResult.fromMap(Map<String, dynamic> json) {
+    return VideoResult(
+      id: json['id'],
+      iso6391: json['iso_639_1'],
+      iso31661: json['iso_3166_1'],
+      key: json['key'],
+      name: json['name'],
+      site: json['site'],
+      size: json['size'],
+      type: json['type'],
     );
   }
 }
