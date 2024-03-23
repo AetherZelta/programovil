@@ -52,3 +52,18 @@ class ApiVideo {
     return null;
   }
 }
+
+class ApiMovieDetail {
+  final URL = "https://api.themoviedb.org/3/movie/";
+  final api_key = "?api_key=73c295392359efe7df0a34433173fd7e";
+  final dio = Dio();
+
+  Future<Map<String, dynamic>?> getMovieDetail(String endpoint) async {
+    var consultUrl = URL + endpoint + api_key;
+    Response response = await dio.get(consultUrl);
+    if (response.statusCode == 200) {
+      return response.data as Map<String, dynamic>;
+    }
+    return null;
+  }
+}

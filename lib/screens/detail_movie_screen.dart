@@ -2,6 +2,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:programovil/model/popular_model.dart';
+import 'package:programovil/model/video_model.dart';
 import 'package:programovil/network/api_popular.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -17,8 +18,46 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
   bool isVideoPlayerOpen = false;
 
   late YoutubePlayerController _controller;
+  List<VideoModel>? videoModel;
 
   get snapshot => null;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: '',
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void openVideoPlayer(String videoKey) {
+    setState(() {
+      isVideoPlayerOpen = true;
+      _controller = YoutubePlayerController(
+          initialVideoId: videoKey,
+          flags: const YoutubePlayerFlags(
+            autoPlay: true,
+            mute: false,
+          ));
+    });
+  }
+
+  void closeVideoPlayer() {
+    setState(() {
+      isVideoPlayerOpen = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,11 +151,48 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                               )
                             ],
                           ),
-                          child: Icon(
+                          child: FutureBuilder<List<VideoModel>?>(
+                              future:
+                                  ApiVideo().getTrailer("${popularModel.id}"),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  videoModel = snapshot.data;
+                                  //videoModel = snapshot.data as VideoModel?;
+                                  return InkWell(
+                                    onTap: () {
+                                      //String? trailerKey =
+                                      String? trailerKey = videoModel!
+                                          .firstWhere(
+                                            (video) =>
+                                                video.site == 'YouTube' &&
+                                                video.type == 'Trailer',
+                                            orElse: () => videoModel!.first,
+                                          )
+                                          .key;
+                                      if (trailerKey != null) {
+                                        openVideoPlayer(trailerKey);
+                                      }
+                                    },
+                                    child: Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                      size: 60,
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Icon(
+                                    Icons.error,
+                                    color: Colors.white,
+                                    size: 60,
+                                  );
+                                }
+                                return CircularProgressIndicator();
+                              }),
+                          /*child: Icon(
                             Icons.play_arrow,
                             color: Colors.white,
                             size: 60,
-                          ),
+                          ),*/
                         )
                       ],
                     ),
@@ -161,6 +237,64 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                                 ))
                           ],
                         ),
+                        SizedBox(height: 10),
+                        FutureBuilder<Map<String, dynamic>?>(
+                            future: ApiMovieDetail()
+                                .getMovieDetail("${popularModel.id}"),
+                            builder: (context,
+                                AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+                              if (snapshot.hasData) {
+                                final Map<String, dynamic>? data =
+                                    snapshot.data;
+                                final List<dynamic>? genres = data?['genres'];
+                                return SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: genres?.map((genre) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
+                                            child: Chip(
+                                              label: Text(
+                                                genre?['name'] ?? '',
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              elevation: 0,
+                                            ),
+                                          );
+                                        }).toList() ??
+                                        [],
+                                  ),
+                                  /*child: ListView.builder(
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: genres?.length ?? 0,
+                                    itemBuilder: (context, index) {
+                                      final genre = genres?[index];
+                                      return ListTile(
+                                        title: Text(
+                                          genre?['name'] ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),*/
+                                );
+                              } else if (snapshot.hasError) {
+                                return const Center(
+                                  child: Text("Ocurrio un error :"),
+                                );
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }),
                         SizedBox(height: 10),
                         Text(
                           popularModel.title.toString(),
@@ -290,6 +424,22 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               ),
             ),
           ),
+          if (isVideoPlayerOpen)
+            GestureDetector(
+              onTap: closeVideoPlayer,
+              child: Container(
+                color: Colors.black.withOpacity(0.8),
+                child: Center(
+                  child: YoutubePlayer(
+                    controller: _controller,
+                    showVideoProgressIndicator: true,
+                    onReady: () {
+                      print('Reproductor Listo');
+                    },
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
