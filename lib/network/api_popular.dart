@@ -2,6 +2,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:programovil/model/popular_model.dart';
+import 'package:programovil/model/video_model.dart';
 
 class ApiPopular {
   final URL =
@@ -31,6 +32,22 @@ class ApiCast {
           .where((cast) => cast['known_for_department'] == 'Acting')
           .toList();
       return actingCastData.map((cast) => Cast.fromMap(cast)).toList();
+    }
+    return null;
+  }
+}
+
+class ApiVideo {
+  final URL = "https://api.themoviedb.org/3/movie/";
+  final api_key = "/videos?api_key=73c295392359efe7df0a34433173fd7e";
+  final dio = Dio();
+  Future<List<VideoModel>?> getTrailer(String endpoint) async {
+    var consultUrl = URL + endpoint + api_key;
+    Response response = await dio.get(consultUrl);
+    if (response.statusCode == 200) {
+      //print(response.data['results'].runtimeType);
+      final listTrailer = response.data['results'] as List;
+      return listTrailer.map((trailer) => VideoModel.fromMap(trailer)).toList();
     }
     return null;
   }

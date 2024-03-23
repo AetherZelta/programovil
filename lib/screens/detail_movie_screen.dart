@@ -1,8 +1,9 @@
-import 'package:blurrycontainer/blurrycontainer.dart';
+//import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:programovil/model/popular_model.dart';
 import 'package:programovil/network/api_popular.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class DetailMovieScreen extends StatefulWidget {
   const DetailMovieScreen({super.key});
@@ -13,6 +14,9 @@ class DetailMovieScreen extends StatefulWidget {
 
 class _DetailMovieScreenState extends State<DetailMovieScreen> {
   bool isFavorite = false;
+  bool isVideoPlayerOpen = false;
+
+  late YoutubePlayerController _controller;
 
   get snapshot => null;
 
@@ -132,19 +136,29 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                         ),
                         SizedBox(height: 10),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.amber,
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${popularModel.voteAverage}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${popularModel.voteAverage}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
+                            Text('${popularModel.releaseDate}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ))
                           ],
                         ),
                         SizedBox(height: 10),
@@ -156,15 +170,23 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         Text(
                           popularModel.overview.toString(),
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 14,
                           ),
                         ),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
+                        Text(
+                          'Cast',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(height: 5),
                         FutureBuilder(
                           future: ApiCast().getCast("${popularModel.id}"),
                           builder:
@@ -261,64 +283,6 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                             }
                           },
                         ),
-                        /*FutureBuilder(
-                          future: ApiCast().getCast("${popularModel.id}"),
-                          builder:
-                              (context, AsyncSnapshot<List<Cast>?> snapshot) {
-                            if (snapshot.hasData) {
-                              return ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: snapshot.data!.length,
-                                  itemBuilder: (context, index) {
-                                    return Card(
-                                      color: Colors.transparent,
-                                      elevation: 8.0,
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: 0.0, horizontal: 5.0),
-                                      child: SizedBox(
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 20.0, vertical: 10.0),
-                                          leading: snapshot.data![index]
-                                                      .profilePath !=
-                                                  null
-                                              ? Image.network(
-                                                  "https://image.tmdb.org/t/p/w500/${snapshot.data![index].profilePath}")
-                                              : Icon(Icons.account_circle),
-                                          title: Text(
-                                            snapshot.data![index]
-                                                    .originalName ??
-                                                '',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          subtitle: Text(
-                                            snapshot.data![index].character ??
-                                                '',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  });
-                            } else {
-                              if (snapshot.hasError) {
-                                return const Center(
-                                  child: Text("Ocurrio un error :"),
-                                );
-                              } else {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            }
-                          },
-                        ),*/
                       ],
                     ),
                   )
@@ -328,111 +292,6 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
           ),
         ],
       ),
-      /*body: Stack(
-        children: [
-          Hero(
-            tag: 'poster_${popularModel.id}',
-            child: Container(
-              /*foregroundDecoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.transparent,
-                    /*Theme.of(context).primaryColor.withOpacity(0.3),
-                    Theme.of(context).primaryColor,*/
-                  ],
-                ),
-              ),*/
-              child: CachedNetworkImage(
-                imageUrl:
-                    'https://image.tmdb.org/t/p/w500${popularModel.posterPath}',
-                fit: BoxFit.cover,
-                /*placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Icon(Icons.error),*/
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isFavorite = !isFavorite;
-                    });
-                  },
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.all(16.0),
-              /*decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black87,
-                  ],
-                ),
-              ),*/
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    popularModel.title.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${popularModel.voteAverage}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),*/
     );
   }
 }
