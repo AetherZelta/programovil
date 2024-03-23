@@ -17,3 +17,21 @@ class ApiPopular {
     return null;
   }
 }
+
+class ApiCast {
+  final URL = "https://api.themoviedb.org/3/movie/";
+  final api_key = "/credits?api_key=73c295392359efe7df0a34433173fd7e";
+  final dio = Dio();
+  Future<List<Cast>?> getCast(String endpoint) async {
+    var consultUrl = URL + endpoint + api_key;
+    Response response = await dio.get(consultUrl);
+    if (response.statusCode == 200) {
+      final List<dynamic> castData = response.data['cast'];
+      final List<dynamic> actingCastData = castData
+          .where((cast) => cast['known_for_department'] == 'Acting')
+          .toList();
+      return actingCastData.map((cast) => Cast.fromMap(cast)).toList();
+    }
+    return null;
+  }
+}

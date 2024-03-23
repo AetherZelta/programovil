@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:programovil/model/popular_model.dart';
 import 'package:programovil/network/api_popular.dart';
@@ -42,8 +43,10 @@ class _PopularMoviesScreenState extends State<PopularMoviesScreen> {
                     borderRadius: BorderRadius.circular(20),
                     child: FadeInImage(
                       placeholder: const AssetImage('images/loading.gif'),
-                      image: NetworkImage(
+                      image: CachedNetworkImageProvider(
                           "https://image.tmdb.org/t/p/w500/${snapshot.data![index].posterPath}"),
+                      /*image: NetworkImage(
+                          "https://image.tmdb.org/t/p/w500/${snapshot.data![index].posterPath}"),*/
                     ),
                   ),
                 ),

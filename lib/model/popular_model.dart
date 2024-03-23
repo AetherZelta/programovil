@@ -90,3 +90,24 @@ class VideoResult {
     );
   }
 }
+
+class Cast {
+  String? knownForDepartment;
+  String? originalName;
+  String? profilePath;
+  String? character;
+
+  Cast({
+    this.knownForDepartment,
+    this.originalName,
+    this.profilePath,
+    this.character,
+  });
+  factory Cast.fromMap(Map<String, dynamic> cast) {
+    return Cast(
+        knownForDepartment: cast['known_for_department'],
+        originalName: cast['original_name'],
+        profilePath: cast['profile_path'],
+        character: cast['character']);
+  }
+}

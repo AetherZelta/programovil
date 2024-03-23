@@ -48,6 +48,7 @@ dependencies:
   cloud_firestore: ^4.15.8
   firebase_auth: ^4.17.8
   cached_network_image: ^3.3.1
+  blurrycontainer: ^1.0.2
 
 
 
