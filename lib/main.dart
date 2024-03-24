@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:programovil/screens/dashboard_screen.dart';
 import 'package:programovil/screens/despensa_screen.dart';
 import 'package:programovil/screens/detail_movie_screen.dart';
+import 'package:programovil/screens/favorites_movie_screen.dart';
 import 'package:programovil/screens/popular_movies_screen.dart';
 import 'package:programovil/screens/products_firebase_screen.dart';
 import 'package:programovil/screens/splash_screen.dart';
@@ -43,7 +44,9 @@ class MyApp extends StatelessWidget {
               "/productos": (BuildContext context) =>
                   const ProductsFirebaseStream(),
               "/movies": (BuildContext context) => const PopularMoviesScreen(),
-              "/detail": (BuildContext context) => const DetailMovieScreen()
+              "/detail": (BuildContext context) => const DetailMovieScreen(),
+              "/favorites": (BuildContext context) =>
+                  const FavoriteMovieScreen(),
             },
           );
         });

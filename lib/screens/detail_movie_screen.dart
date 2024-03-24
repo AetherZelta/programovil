@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:programovil/model/popular_model.dart';
 import 'package:programovil/model/video_model.dart';
 import 'package:programovil/network/api_popular.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class DetailMovieScreen extends StatefulWidget {
@@ -19,12 +20,13 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
 
   late YoutubePlayerController _controller;
   List<VideoModel>? videoModel;
-
+  late PopularModel popularModel;
   get snapshot => null;
 
   @override
   void initState() {
     super.initState();
+    _loadFavoriteStatus();
     _controller = YoutubePlayerController(
       initialVideoId: '',
       flags: const YoutubePlayerFlags(
@@ -32,6 +34,23 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
         mute: false,
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadFavoriteStatus();
+  }
+
+  Future<void> _loadFavoriteStatus() async {
+    popularModel = ModalRoute.of(context)!.settings.arguments as PopularModel;
+    if (popularModel != null) {
+      final String _favoriteKey = 'favorite_${popularModel.id}';
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        isFavorite = prefs.getBool(_favoriteKey) ?? false;
+      });
+    }
   }
 
   @override
@@ -59,25 +78,40 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
     });
   }
 
+  Future<void> addFavorite(int movieId) async {
+    try {
+      await ApiAddFav().postFavMovie(movieId);
+    } catch (e) {
+      print('Error al marcar como favorita: $e');
+    }
+  }
+
+  Future<void> removeFavorite(int movieId) async {
+    try {
+      await ApiDeleteFav().deleteFavMovie(movieId);
+    } catch (e) {
+      print('Error al eliminar como favorita: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final popularModel =
-        ModalRoute.of(context)!.settings.arguments as PopularModel;
+    /*final popularModel =
+        ModalRoute.of(context)!.settings.arguments as PopularModel;*/
+
+    final String _favoriteKey = 'favorite_${popularModel.id}';
 
     return Scaffold(
       body: Stack(
         children: [
           Opacity(
             opacity: 0.5,
-            child: Hero(
-              tag: 'poster_${popularModel.id}',
-              child: CachedNetworkImage(
-                imageUrl:
-                    'https://image.tmdb.org/t/p/w500${popularModel.posterPath}',
-                height: double.infinity,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+            child: CachedNetworkImage(
+              imageUrl:
+                  'https://image.tmdb.org/t/p/w500${popularModel.posterPath}',
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
           SingleChildScrollView(
@@ -99,14 +133,35 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                             size: 30,
                           ),
                         ),
-                        InkWell(
+                        IconButton(
+                          icon: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          onPressed: () async {
+                            setState(() {
+                              isFavorite = !isFavorite;
+                            });
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setBool(_favoriteKey, isFavorite);
+                            if (popularModel.id != null) {
+                              if (isFavorite) {
+                                await addFavorite(popularModel.id!);
+                              } else {
+                                await removeFavorite(popularModel.id!);
+                              }
+                            }
+                          },
+                        ),
+                        /*InkWell(
                           onTap: () {},
                           child: const Icon(
                             Icons.favorite_border,
                             color: Colors.white,
                             size: 30,
                           ),
-                        )
+                        )*/
                       ],
                     ),
                   ),
@@ -116,23 +171,26 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
+                        Hero(
+                          tag: 'poster_${popularModel.id}',
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    spreadRadius: 1,
+                                    blurRadius: 8,
+                                  )
+                                ]),
+                            child: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 8,
-                                )
-                              ]),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: CachedNetworkImage(
-                              imageUrl:
-                                  'https://image.tmdb.org/t/p/w500${popularModel.posterPath}',
-                              height: 250,
-                              width: 180,
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    'https://image.tmdb.org/t/p/w500${popularModel.posterPath}',
+                                height: 250,
+                                width: 180,
+                              ),
                             ),
                           ),
                         ),
@@ -222,7 +280,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${popularModel.voteAverage}',
+                                  '${(popularModel.voteAverage)?.toStringAsFixed(1)}/10',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,

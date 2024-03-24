@@ -67,3 +67,71 @@ class ApiMovieDetail {
     return null;
   }
 }
+
+class ApiGetFav {
+  final URL =
+      "https://api.themoviedb.org/3/account/21061255/favorite/movies?api_key=73c295392359efe7df0a34433173fd7e&session_id=7830065d6e3615770524764247134c0ebd0e257f";
+  final dio = Dio();
+  Future<List<PopularModel>?> getFavMovie() async {
+    var consultUrl = URL;
+    Response response = await dio.get(consultUrl);
+    if (response.statusCode == 200) {
+      //print(response.data['results'].runtimeType);
+      final listMoviesMap = response.data['results'] as List;
+      return listMoviesMap.map((movie) => PopularModel.fromMap(movie)).toList();
+    }
+    return null;
+  }
+}
+
+class ApiAddFav {
+  final URL =
+      "https://api.themoviedb.org/3/account/21061255/favorite?api_key=73c295392359efe7df0a34433173fd7e&session_id=7830065d6e3615770524764247134c0ebd0e257f";
+  final dio = Dio();
+
+  Future<void> postFavMovie(int mediaId) async {
+    try {
+      final String postUrl = URL;
+      Map<String, dynamic> body = {
+        "media_type": "movie",
+        "media_id": mediaId,
+        "favorite": true
+      };
+      Response response = await dio.post(postUrl, data: body);
+      if (response.statusCode == 200) {
+        print('Película marcada como favorita exitosamente.');
+      } else {
+        print(
+            'Error al marcar la película como favorita. Código de estado: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud POST: $e');
+    }
+  }
+}
+
+class ApiDeleteFav {
+  final URL =
+      "https://api.themoviedb.org/3/account/21061255/favorite?api_key=73c295392359efe7df0a34433173fd7e&session_id=7830065d6e3615770524764247134c0ebd0e257f";
+  final dio = Dio();
+
+  Future<void> deleteFavMovie(int mediaId) async {
+    try {
+      final String postUrl = URL;
+      Map<String, dynamic> body = {
+        "media_type": "movie",
+        "media_id": mediaId,
+        "favorite": false
+      };
+      Response response = await dio.post(postUrl, data: body);
+      if (response.statusCode == 200) {
+        print('Película eliminada como favorita exitosamente.');
+      } else {
+        print(
+            'Error al marcar la película como favorita. Código de estado: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en la solicitud POST: $e');
+    }
+  }
+}

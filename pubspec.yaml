@@ -50,6 +50,7 @@ dependencies:
   cached_network_image: ^3.3.1
   blurrycontainer: ^1.0.2
   youtube_player_flutter: ^8.0.0
+  shared_preferences: ^2.0.17
 
 
 
